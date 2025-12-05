@@ -1,0 +1,5 @@
+{
+  "name": "Quản lý Tồn kho Hóa chất",
+  "description": "Ứng dụng quản lý kho hóa chất, theo dõi nhập xuất và thống kê chi tiết.",
+  "requestFramePermissions": []
+}
