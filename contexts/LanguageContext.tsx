@@ -100,6 +100,9 @@ const translations = {
     exportSuccess: "Đã xuất hàng thành công!",
     exportStockError: "Tồn kho chỉ còn {current} {unit}.",
     exportSuccessDetail: "Đã xuất {qty} {unit} thành công!",
+    location: "Vị trí",
+    filterLocation: "Lọc Vị trí",
+    allLocations: "Tất cả vị trí",
 
     // Production
     productionTitle: "Pha chế & Sản xuất",
@@ -125,6 +128,7 @@ const translations = {
     adjustmentHint: "Nhập số âm nếu bay hơi, số dương nếu thêm dung môi phụ",
     finalOutput: "Thành phẩm tạo ra",
     destWarehouse: "Kho Nhập (Thành phẩm)",
+    selectLocation: "Chọn Vị trí lưu kho",
     
     // General Production
     selectMaterial: "-- Chọn hóa chất --",
@@ -139,6 +143,7 @@ const translations = {
     fillAll: "Vui lòng chọn thành phẩm và ít nhất 1 hóa chất thành phần",
     invalidOutput: "Khối lượng thành phẩm phải lớn hơn 0",
     selectDestFactory: "Vui lòng chọn Kho Nhập",
+    selectDestLocation: "Vui lòng chọn Vị trí lưu kho",
     confirmProdTitle: "Xác nhận sản xuất?",
     confirmProdHtml: "Bạn sẽ tạo ra <b>{qty} {unit}</b> <br/> {name}",
     
@@ -265,6 +270,9 @@ const translations = {
     exportSuccess: "Exported successfully!",
     exportStockError: "Stock only has {current} {unit} remaining.",
     exportSuccessDetail: "Successfully exported {qty} {unit}!",
+    location: "Location",
+    filterLocation: "Filter Location",
+    allLocations: "All Locations",
 
     // Production
     productionTitle: "Mixing & Production",
@@ -290,6 +298,7 @@ const translations = {
     adjustmentHint: "Negative for evaporation, positive for additives",
     finalOutput: "Final Output Quantity",
     destWarehouse: "Dest. Warehouse",
+    selectLocation: "Select Storage Location",
 
     // General Production
     selectMaterial: "-- Select Chemical --",
@@ -304,6 +313,7 @@ const translations = {
     fillAll: "Please select a target and at least 1 source chemical",
     invalidOutput: "Output quantity must be greater than 0",
     selectDestFactory: "Please select Destination Warehouse",
+    selectDestLocation: "Please select Storage Location",
     confirmProdTitle: "Confirm Production?",
     confirmProdHtml: "You are about to produce <b>{qty} {unit}</b> <br/> {name}",
 

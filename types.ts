@@ -14,6 +14,7 @@ export interface InventoryItem {
   requiredQty: number;
   stockIn: number; // Số lượng tồn kho hiện tại
   factoryCode: string;
+  location?: string; // Vị trí kho (A1-A100)
   type?: 'MATERIAL' | 'PRODUCT'; // Phân loại: Nguyên liệu hoặc Thành phẩm
 }
 

@@ -310,5 +310,28 @@ export const StorageService = {
   getUser: (): User | null => {
     const data = localStorage.getItem(KEYS.USER);
     return data ? JSON.parse(data) : null;
+  },
+
+  exportData: (): string => {
+    const data = {
+      items: StorageService.getItems(),
+      transactions: StorageService.getTransactions()
+    };
+    return JSON.stringify(data, null, 2);
+  },
+
+  importData: (jsonContent: string): boolean => {
+    try {
+      const data = JSON.parse(jsonContent);
+      if (data && Array.isArray(data.items) && Array.isArray(data.transactions)) {
+        localStorage.setItem(KEYS.ITEMS, JSON.stringify(data.items));
+        localStorage.setItem(KEYS.TRANSACTIONS, JSON.stringify(data.transactions));
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error('Import failed:', error);
+      return false;
+    }
   }
 };

@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { StorageService } from '../services/storage';
 import { InventoryItem, TransactionType } from '../types';
-import { PackageCheck, Search, ChevronLeft, ChevronRight, Filter, Truck, X, Layers, Tag } from 'lucide-react';
+import { PackageCheck, Search, ChevronLeft, ChevronRight, Filter, Truck, X, Layers, Tag, MapPin } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import {
   useReactTable,
@@ -56,7 +56,10 @@ const ProductionInventory: React.FC = () => {
     const groups: Record<string, GroupedInventoryItem> = {};
     
     productItems.forEach(item => {
-      const key = `${item.itemCode}_${item.factoryCode}`;
+      // Group by ItemCode + Factory + Location (if distinct)
+      // If location is undefined, use 'N/A' to group them together
+      const locKey = item.location || 'N/A';
+      const key = `${item.itemCode}_${item.factoryCode}_${locKey}`;
       
       if (!groups[key]) {
         groups[key] = {
@@ -84,6 +87,17 @@ const ProductionInventory: React.FC = () => {
     const factories = new Set(rawItems.map(item => item.factoryCode).filter(Boolean));
     return Array.from(factories).sort();
   }, [rawItems]);
+
+  // Unique Locations
+  const uniqueLocations = useMemo(() => {
+    const locs = new Set(groupedItems.map(item => item.location).filter(Boolean));
+    return Array.from(locs).sort((a,b) => {
+        // Sort A1, A2... nicely
+        const numA = parseInt(a!.replace(/\D/g, '')) || 0;
+        const numB = parseInt(b!.replace(/\D/g, '')) || 0;
+        return numA - numB;
+    });
+  }, [groupedItems]);
 
   // Unique Codes
   const uniqueCodes = useMemo(() => {
@@ -138,7 +152,7 @@ const ProductionInventory: React.FC = () => {
                     type: TransactionType.OUT,
                     quantity: deduct,
                     date: date,
-                    note: `EXPORT DISTRIBUTED: ${exportNote} (Batch ID: ${item.id.slice(0,4)}...)`
+                    note: `EXPORT: ${exportNote} (Loc: ${item.location || '-'})`
                 };
                 StorageService.addTransaction(transaction);
                 
@@ -189,6 +203,21 @@ const ProductionInventory: React.FC = () => {
       size: 80,
       cell: info => <span className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded border border-gray-200 dark:border-gray-600">{info.getValue()}</span>,
       filterFn: 'equals',
+    }),
+    // LOCATION COLUMN
+    columnHelper.accessor('location', {
+        id: 'location',
+        header: t('location'),
+        size: 80,
+        cell: info => (
+            info.getValue() ? (
+                <span className="flex items-center gap-1 text-xs font-semibold text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-900/20 px-2 py-1 rounded">
+                    <MapPin className="w-3 h-3" />
+                    {info.getValue()}
+                </span>
+            ) : <span className="text-xs text-gray-400">-</span>
+        ),
+        filterFn: 'equals',
     }),
     columnHelper.accessor('unit', {
         header: t('unit'),
@@ -251,6 +280,7 @@ const ProductionInventory: React.FC = () => {
         
         {/* Search & Filter */}
         <div className="bg-white dark:bg-gray-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 grid grid-cols-1 md:grid-cols-12 gap-3 items-center transition-colors">
+            
             {/* Factory Filter */}
             <div className="md:col-span-2 relative">
                 <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -266,8 +296,23 @@ const ProductionInventory: React.FC = () => {
                 </select>
             </div>
 
+            {/* Location Filter */}
+            <div className="md:col-span-2 relative">
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <select
+                  className="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 outline-none text-sm bg-gray-50 dark:bg-gray-700/50 hover:bg-white dark:hover:bg-gray-700 cursor-pointer text-gray-800 dark:text-gray-200"
+                  value={(table.getColumn('location')?.getFilterValue() as string) ?? ''}
+                  onChange={e => table.getColumn('location')?.setFilterValue(e.target.value || undefined)}
+                >
+                  <option value="">{t('allLocations')}</option>
+                  {uniqueLocations.map(loc => (
+                    <option key={loc} value={loc}>{loc}</option>
+                  ))}
+                </select>
+            </div>
+
             {/* Item Code Filter */}
-            <div className="md:col-span-3 relative">
+            <div className="md:col-span-2 relative">
                 <Tag className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <select
                   className="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 focus:border-indigo-500 outline-none text-sm bg-gray-50 dark:bg-gray-700/50 text-gray-800 dark:text-gray-200"
@@ -281,7 +326,7 @@ const ProductionInventory: React.FC = () => {
                 </select>
             </div>
 
-            <div className="md:col-span-7 flex gap-2">
+            <div className="md:col-span-6 flex gap-2">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input 
@@ -355,6 +400,7 @@ const ProductionInventory: React.FC = () => {
                             </div>
                             <div className="mt-1 text-xs text-gray-500 dark:text-gray-400 flex justify-between">
                                     <span>Factory: {selectedGroup.factoryCode}</span>
+                                    <span>Loc: {selectedGroup.location || '-'}</span>
                             </div>
                         </div>
                         <div>

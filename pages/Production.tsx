@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { StorageService } from '../services/storage';
 import { InventoryItem, TransactionType } from '../types';
 import { useLanguage } from '../contexts/LanguageContext';
-import { Factory, Plus, Trash2, ArrowRightCircle, Calculator, Box, Warehouse, Tag } from 'lucide-react';
+import { Factory, Plus, Trash2, ArrowRightCircle, Calculator, Box, Warehouse, Tag, MapPin } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import Swal from 'sweetalert2';
 
@@ -42,6 +42,12 @@ const Production: React.FC = () => {
   // 3. Calculation & Destination State
   const [adjustment, setAdjustment] = useState<string>('0');
   const [destFactory, setDestFactory] = useState<string>(''); 
+  const [selectedLocation, setSelectedLocation] = useState<string>('');
+
+  // Location Generator A1 - A100
+  const availableLocations = useMemo(() => {
+    return Array.from({length: 100}, (_, i) => `A${i + 1}`);
+  }, []);
 
   useEffect(() => {
     setItems(StorageService.getItems());
@@ -148,6 +154,16 @@ const Production: React.FC = () => {
       return;
     }
 
+    if (!selectedLocation) {
+        Swal.fire({
+          icon: 'warning',
+          title: t('missingInfo'),
+          text: t('selectDestLocation'),
+          confirmButtonColor: '#f59e0b',
+        });
+        return;
+      }
+
     // Confirmation Dialog
     Swal.fire({
       title: t('confirmProdTitle'),
@@ -200,6 +216,7 @@ const Production: React.FC = () => {
         requiredQty: 0,
         stockIn: 0, 
         factoryCode: destFactory, 
+        location: selectedLocation,
         type: 'PRODUCT'
       };
       StorageService.addItem(newItem);
@@ -212,7 +229,7 @@ const Production: React.FC = () => {
         type: TransactionType.IN,
         quantity: finalOutput,
         date: date,
-        note: `Produced from ${sourceEntries.length} sources. Adj: ${adjustment}kg`
+        note: `Produced from ${sourceEntries.length} sources. Adj: ${adjustment}kg. Loc: ${selectedLocation}`
       };
       StorageService.addTransaction(inTransaction);
 
@@ -230,6 +247,7 @@ const Production: React.FC = () => {
       setSelectedMasterId('');
       setSourceEntries([]);
       setAdjustment('0');
+      setSelectedLocation('');
       
       // Refresh Data
       setItems(StorageService.getItems());
@@ -447,6 +465,24 @@ const Production: React.FC = () => {
                           <option value="">-- {t('factory')} --</option>
                           {uniqueFactories.map(f => (
                             <option key={f} value={f}>{f}</option>
+                          ))}
+                        </select>
+                    </div>
+                  </div>
+
+                  {/* Storage Location Selector */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('selectLocation')}</label>
+                    <div className="relative">
+                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <select
+                          className="w-full pl-9 pr-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 focus:border-indigo-500 outline-none font-semibold bg-white dark:bg-gray-700 text-gray-800 dark:text-white appearance-none cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                          value={selectedLocation}
+                          onChange={(e) => setSelectedLocation(e.target.value)}
+                        >
+                          <option value="">-- {t('location')} --</option>
+                          {availableLocations.map(loc => (
+                            <option key={loc} value={loc}>{loc}</option>
                           ))}
                         </select>
                     </div>
