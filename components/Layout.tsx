@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, FlaskConical, PieChart, LogOut, Menu, X, Factory, Globe, PackageCheck, Moon, Sun, ArrowLeftRight } from 'lucide-react';
+import { LayoutDashboard, FlaskConical, PieChart, LogOut, Menu, X, Factory, Globe, PackageCheck, Moon, Sun, ArrowLeftRight, Maximize, Minimize } from 'lucide-react';
 import { StorageService } from '../services/storage';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTheme } from '../contexts/ThemeContext';
@@ -14,12 +14,30 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const location = useLocation();
   const user = StorageService.getUser();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false);
   const { language, toggleLanguage, t } = useLanguage();
   const { theme, toggleTheme } = useTheme();
 
   const handleLogout = () => {
     StorageService.logout();
     navigate('/');
+  };
+
+  const toggleFullScreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().then(() => {
+        setIsFullScreen(true);
+      }).catch(err => {
+        console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+      });
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().then(() => {
+          setIsFullScreen(false);
+        });
+      }
+    }
   };
 
   const isActive = (path: string) => location.pathname === path;
@@ -48,6 +66,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </span>
         </div>
         <div className="flex items-center gap-3">
+          {/* Full Screen Toggle */}
+          <button 
+             onClick={toggleFullScreen}
+             className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors hidden sm:flex"
+             title={isFullScreen ? 'Exit Full Screen' : 'Full Screen'}
+          >
+             {isFullScreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+          </button>
+
           {/* Theme Toggle */}
           <button 
              onClick={toggleTheme}
@@ -65,8 +92,64 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
              <Globe className="w-3.5 h-3.5" />
              {language === 'vi' ? 'VN' : 'EN'}
           </button>
-          <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-700 dark:text-indigo-300 font-bold text-xs">
-            {user?.EMP_NAME?.charAt(0).toUpperCase()}
+          
+          {/* User Profile Dropdown */}
+          <div className="relative">
+            <button 
+              onClick={() => setIsProfileOpen(!isProfileOpen)}
+              className="w-9 h-9 rounded-full overflow-hidden border border-gray-200 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all hover:ring-2 hover:ring-indigo-100 dark:hover:ring-indigo-900"
+            >
+              {user?.PHOTO_URL ? (
+                <img 
+                  src={user.PHOTO_URL} 
+                  alt={user.EMP_NAME} 
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    // Fallback to initials if image fails to load
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.parentElement?.classList.add('bg-indigo-100', 'dark:bg-indigo-900', 'flex', 'items-center', 'justify-center', 'text-indigo-700', 'dark:text-indigo-300', 'font-bold', 'text-xs');
+                    if(e.currentTarget.parentElement) e.currentTarget.parentElement.innerText = user?.EMP_NAME?.charAt(0).toUpperCase() || 'U';
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-700 dark:text-indigo-300 font-bold text-xs">
+                  {user?.EMP_NAME?.charAt(0).toUpperCase()}
+                </div>
+              )}
+            </button>
+
+            {/* Profile Dropdown Menu */}
+            {isProfileOpen && (
+              <>
+                <div 
+                  className="fixed inset-0 z-40" 
+                  onClick={() => setIsProfileOpen(false)} 
+                />
+                <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 z-50 animate-in fade-in zoom-in-95 duration-100 origin-top-right">
+                  <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+                    <p className="font-bold text-gray-800 dark:text-white truncate text-sm">
+                      {user?.EMP_NAME}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">
+                      {user?.DEPT_NM}
+                    </p>
+                    <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-0.5 font-mono">
+                      ID: {user?.EMP_ID}
+                    </p>
+                  </div>
+                  
+                  <div className="p-2">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-3 py-2 rounded-lg text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2 transition-colors font-medium"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      {t('logout')}
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </header>
