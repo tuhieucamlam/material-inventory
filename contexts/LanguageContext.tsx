@@ -10,6 +10,18 @@ interface LanguageContextType {
 
 const translations = {
   vi: {
+    // Common Alerts
+    success: "Thành công",
+    error: "Lỗi",
+    warning: "Cảnh báo",
+    info: "Thông tin",
+    confirm: "Xác nhận",
+    cancel: "Hủy",
+    processing: "Đang xử lý...",
+    missingInfo: "Thiếu thông tin",
+    connectionError: "Lỗi kết nối",
+    connectionErrorDesc: "Không thể kết nối đến máy chủ xác thực.",
+    
     // Login
     loginWelcome: "Xin chào!",
     loginSubtitle: "Quẹt thẻ hoặc nhập mã nhân viên.",
@@ -17,6 +29,8 @@ const translations = {
     password: "Mật khẩu",
     signIn: "Đăng nhập",
     loginError: "Mã nhân viên không tồn tại hoặc lỗi kết nối.",
+    loginSuccess: "Đăng nhập thành công!",
+    enterEmpId: "Vui lòng nhập mã nhân viên",
     rememberMe: "Ghi nhớ mã nhân viên",
     appTitle1: "Quản lý Tồn kho",
     appTitle2: "& Sản xuất",
@@ -24,6 +38,27 @@ const translations = {
     version: "Phiên bản 1.3.0",
     support: "Hỗ trợ",
     languageName: "Tiếng Việt",
+
+    // Operations
+    opsTitle: "Nhập / Xuất Kho",
+    opsSubtitle: "Tạo phiếu nhập hàng hoặc xuất hàng",
+    inbound: "Nhập Kho",
+    outbound: "Xuất Kho",
+    inboundDesc: "Nhập thêm hàng hóa vào kho. Số lượng tồn kho sẽ tăng lên.",
+    outboundDesc: "Xuất hàng hóa khỏi kho. Số lượng tồn kho sẽ giảm đi.",
+    createIn: "Tạo phiếu nhập",
+    createOut: "Tạo phiếu xuất",
+    selectCode: "1. Chọn Mã hàng",
+    selectDetail: "2. Chọn Tên chi tiết",
+    quantity: "Số lượng",
+    note: "Ghi chú (tùy chọn)",
+    confirmIn: "Xác nhận Nhập kho",
+    confirmOut: "Xác nhận Xuất kho",
+    stockErrorTitle: "Lỗi Tồn Kho",
+    stockErrorDesc: "Tồn kho hiện tại ({current}) không đủ để xuất {request}.",
+    opSuccessDesc: "Đã {type} kho thành công.",
+    typeIn: "nhập",
+    typeOut: "xuất",
 
     // Menu
     dashboard: "Tổng quan",
@@ -63,6 +98,8 @@ const translations = {
     exportQty: "Số lượng xuất",
     confirmExport: "Xác nhận Xuất",
     exportSuccess: "Đã xuất hàng thành công!",
+    exportStockError: "Tồn kho chỉ còn {current} {unit}.",
+    exportSuccessDetail: "Đã xuất {qty} {unit} thành công!",
 
     // Production
     productionTitle: "Pha chế & Sản xuất",
@@ -95,10 +132,15 @@ const translations = {
     usedQty: "Sử dụng",
     factoryCode: "Mã kho",
     transformBtn: "Xác nhận Pha chế",
-    processing: "Đang xử lý...",
     successTransform: "Sản xuất thành công!",
+    successTransformDetail: "Đã nhập kho {qty} {unit} thành phẩm.",
     errorStock: "Số lượng sử dụng vượt quá tồn kho!",
+    errorStockDetail: "Tồn kho hiện tại: {current} {unit}. Bạn đang nhập: {request}.",
     fillAll: "Vui lòng chọn thành phẩm và ít nhất 1 hóa chất thành phần",
+    invalidOutput: "Khối lượng thành phẩm phải lớn hơn 0",
+    selectDestFactory: "Vui lòng chọn Kho Nhập",
+    confirmProdTitle: "Xác nhận sản xuất?",
+    confirmProdHtml: "Bạn sẽ tạo ra <b>{qty} {unit}</b> <br/> {name}",
     
     // Home
     welcome: "Quản lý Tồn kho Hóa chất",
@@ -133,6 +175,18 @@ const translations = {
     backHome: "Về Trang chủ",
   },
   en: {
+    // Common Alerts
+    success: "Success",
+    error: "Error",
+    warning: "Warning",
+    info: "Info",
+    confirm: "Confirm",
+    cancel: "Cancel",
+    processing: "Processing...",
+    missingInfo: "Missing Information",
+    connectionError: "Connection Error",
+    connectionErrorDesc: "Cannot connect to authentication server.",
+
     // Login
     loginWelcome: "Welcome back!",
     loginSubtitle: "Please scan your card or enter Employee ID.",
@@ -140,6 +194,8 @@ const translations = {
     password: "Password",
     signIn: "Sign In",
     loginError: "Invalid Employee ID or connection error.",
+    loginSuccess: "Login Successful!",
+    enterEmpId: "Please enter Employee ID",
     rememberMe: "Remember ID",
     appTitle1: "Inventory Management",
     appTitle2: "& Production",
@@ -147,6 +203,27 @@ const translations = {
     version: "Version 1.3.0",
     support: "Support",
     languageName: "English",
+
+    // Operations
+    opsTitle: "Inbound / Outbound",
+    opsSubtitle: "Create stock in or stock out tickets",
+    inbound: "Inbound",
+    outbound: "Outbound",
+    inboundDesc: "Add items to inventory. Stock levels will increase.",
+    outboundDesc: "Remove items from inventory. Stock levels will decrease.",
+    createIn: "Create In-Ticket",
+    createOut: "Create Out-Ticket",
+    selectCode: "1. Select Item Code",
+    selectDetail: "2. Select Detail Item",
+    quantity: "Quantity",
+    note: "Note (Optional)",
+    confirmIn: "Confirm Inbound",
+    confirmOut: "Confirm Outbound",
+    stockErrorTitle: "Stock Error",
+    stockErrorDesc: "Current stock ({current}) is insufficient for request {request}.",
+    opSuccessDesc: "Successfully {type} items.",
+    typeIn: "imported",
+    typeOut: "exported",
 
     // Menu
     dashboard: "Dashboard",
@@ -186,6 +263,8 @@ const translations = {
     exportQty: "Export Quantity",
     confirmExport: "Confirm Export",
     exportSuccess: "Exported successfully!",
+    exportStockError: "Stock only has {current} {unit} remaining.",
+    exportSuccessDetail: "Successfully exported {qty} {unit}!",
 
     // Production
     productionTitle: "Mixing & Production",
@@ -218,10 +297,15 @@ const translations = {
     usedQty: "Used",
     factoryCode: "Warehouse Code",
     transformBtn: "Confirm Mixing",
-    processing: "Processing...",
     successTransform: "Production Successful!",
+    successTransformDetail: "Stocked in {qty} {unit} of finished product.",
     errorStock: "Usage quantity exceeds current stock!",
+    errorStockDetail: "Current stock: {current} {unit}. You requested: {request}.",
     fillAll: "Please select a target and at least 1 source chemical",
+    invalidOutput: "Output quantity must be greater than 0",
+    selectDestFactory: "Please select Destination Warehouse",
+    confirmProdTitle: "Confirm Production?",
+    confirmProdHtml: "You are about to produce <b>{qty} {unit}</b> <br/> {name}",
 
     // Home
     welcome: "Chemical Inventory",

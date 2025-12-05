@@ -96,7 +96,7 @@ const Production: React.FC = () => {
       Swal.fire({
         icon: 'error',
         title: t('errorStock'),
-        text: `Tồn kho hiện tại: ${item.stockIn} ${item.unit}. Bạn đang nhập: ${qty}.`,
+        text: t('errorStockDetail').replace('{current}', item.stockIn.toString()).replace('{unit}', item.unit).replace('{request}', qty.toString()),
         confirmButtonColor: '#d33',
       });
       return;
@@ -121,7 +121,7 @@ const Production: React.FC = () => {
     if (!selectedMaster || sourceEntries.length === 0) {
       Swal.fire({
         icon: 'warning',
-        title: 'Thiếu thông tin',
+        title: t('missingInfo'),
         text: t('fillAll'),
         confirmButtonColor: '#f59e0b',
       });
@@ -131,8 +131,8 @@ const Production: React.FC = () => {
     if (finalOutput <= 0) {
       Swal.fire({
         icon: 'error',
-        title: 'Lỗi',
-        text: "Khối lượng thành phẩm phải lớn hơn 0",
+        title: t('error'),
+        text: t('invalidOutput'),
         confirmButtonColor: '#d33',
       });
       return;
@@ -141,8 +141,8 @@ const Production: React.FC = () => {
     if (!destFactory) {
       Swal.fire({
         icon: 'warning',
-        title: 'Thiếu thông tin',
-        text: "Vui lòng chọn Kho Nhập",
+        title: t('missingInfo'),
+        text: t('selectDestFactory'),
         confirmButtonColor: '#f59e0b',
       });
       return;
@@ -150,14 +150,14 @@ const Production: React.FC = () => {
 
     // Confirmation Dialog
     Swal.fire({
-      title: 'Xác nhận sản xuất?',
-      html: `Bạn sẽ tạo ra <b>${finalOutput} ${selectedMaster.unit}</b> <br/> ${selectedMaster.name}`,
+      title: t('confirmProdTitle'),
+      html: t('confirmProdHtml').replace('{qty}', finalOutput.toString()).replace('{unit}', selectedMaster.unit).replace('{name}', selectedMaster.name),
       icon: 'question',
       showCancelButton: true,
       confirmButtonColor: '#4f46e5',
       cancelButtonColor: '#d33',
-      confirmButtonText: 'Xác nhận',
-      cancelButtonText: 'Hủy'
+      confirmButtonText: t('confirm'),
+      cancelButtonText: t('cancel')
     }).then((result) => {
       if (result.isConfirmed) {
         processProduction();
@@ -221,7 +221,7 @@ const Production: React.FC = () => {
       Swal.fire({
         icon: 'success',
         title: t('successTransform'),
-        text: `Đã nhập kho ${finalOutput} ${selectedMaster!.unit} thành phẩm.`,
+        text: t('successTransformDetail').replace('{qty}', finalOutput.toString()).replace('{unit}', selectedMaster!.unit),
         timer: 2000,
         showConfirmButton: false
       });
@@ -444,7 +444,7 @@ const Production: React.FC = () => {
                           value={destFactory}
                           onChange={(e) => setDestFactory(e.target.value)}
                         >
-                          <option value="">-- Chọn Kho Nhập --</option>
+                          <option value="">-- {t('factory')} --</option>
                           {uniqueFactories.map(f => (
                             <option key={f} value={f}>{f}</option>
                           ))}

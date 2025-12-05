@@ -107,8 +107,8 @@ const ProductionInventory: React.FC = () => {
     if (exportQty > selectedGroup.stockIn) {
         Swal.fire({
             icon: 'error',
-            title: t('errorStock'),
-            text: `Tồn kho chỉ còn ${selectedGroup.stockIn} ${selectedGroup.unit}.`,
+            title: t('stockErrorTitle'),
+            text: t('exportStockError').replace('{current}', selectedGroup.stockIn.toString()).replace('{unit}', selectedGroup.unit),
             confirmButtonColor: '#d33',
         });
         return;
@@ -152,8 +152,8 @@ const ProductionInventory: React.FC = () => {
 
         Swal.fire({
             icon: 'success',
-            title: t('exportSuccess'),
-            text: `Đã xuất ${exportQty} ${selectedGroup.unit} thành công!`,
+            title: t('success'),
+            text: t('exportSuccessDetail').replace('{qty}', exportQty.toString()).replace('{unit}', selectedGroup.unit),
             timer: 1500,
             showConfirmButton: false
         });

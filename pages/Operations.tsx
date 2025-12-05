@@ -4,8 +4,10 @@ import { InventoryItem, TransactionType } from '../types';
 import { ArrowDownCircle, ArrowUpCircle, X } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import Swal from 'sweetalert2';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const Operations: React.FC = () => {
+  const { t } = useLanguage();
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState<TransactionType>(TransactionType.IN);
@@ -52,8 +54,8 @@ const Operations: React.FC = () => {
         setLoading(false);
         Swal.fire({
             icon: 'error',
-            title: 'Lỗi Tồn Kho',
-            text: `Tồn kho hiện tại (${item.stockIn}) không đủ để xuất ${quantity}.`,
+            title: t('stockErrorTitle'),
+            text: t('stockErrorDesc').replace('{current}', item.stockIn.toString()).replace('{request}', quantity.toString()),
         });
         return;
     }
@@ -80,10 +82,11 @@ const Operations: React.FC = () => {
       // Close Modal and Show Success
       setIsModalOpen(false);
       
+      const typeStr = modalType === TransactionType.IN ? t('typeIn') : t('typeOut');
       Swal.fire({
           icon: 'success',
-          title: 'Thành công!',
-          text: `Đã ${modalType === TransactionType.IN ? 'nhập' : 'xuất'} kho thành công.`,
+          title: t('success'),
+          text: t('opSuccessDesc').replace('{type}', typeStr),
           timer: 1500,
           showConfirmButton: false
       });
@@ -98,8 +101,8 @@ const Operations: React.FC = () => {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Nhập / Xuất Kho</h1>
-        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Tạo phiếu nhập hàng hoặc xuất hàng</p>
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">{t('opsTitle')}</h1>
+        <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{t('opsSubtitle')}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -113,10 +116,10 @@ const Operations: React.FC = () => {
             <div className="w-14 h-14 bg-green-100 dark:bg-green-900/40 text-green-600 dark:text-green-400 rounded-xl flex items-center justify-center mb-6">
               <ArrowDownCircle className="w-8 h-8" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">Nhập Kho (Incoming)</h2>
-            <p className="text-gray-500 dark:text-gray-400 mb-6">Nhập thêm hàng hóa vào kho. Số lượng tồn kho sẽ tăng lên.</p>
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">{t('inbound')}</h2>
+            <p className="text-gray-500 dark:text-gray-400 mb-6">{t('inboundDesc')}</p>
             <span className="inline-flex items-center text-green-600 dark:text-green-400 font-medium">
-              Tạo phiếu nhập &rarr;
+              {t('createIn')} &rarr;
             </span>
           </div>
         </button>
@@ -131,10 +134,10 @@ const Operations: React.FC = () => {
             <div className="w-14 h-14 bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400 rounded-xl flex items-center justify-center mb-6">
               <ArrowUpCircle className="w-8 h-8" />
             </div>
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">Xuất Kho (Outgoing)</h2>
-            <p className="text-gray-500 dark:text-gray-400 mb-6">Xuất hàng hóa khỏi kho. Số lượng tồn kho sẽ giảm đi.</p>
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-white mb-2">{t('outbound')}</h2>
+            <p className="text-gray-500 dark:text-gray-400 mb-6">{t('outboundDesc')}</p>
             <span className="inline-flex items-center text-orange-600 dark:text-orange-400 font-medium">
-              Tạo phiếu xuất &rarr;
+              {t('createOut')} &rarr;
             </span>
           </div>
         </button>
@@ -147,7 +150,7 @@ const Operations: React.FC = () => {
             <div className={`px-6 py-4 flex items-center justify-between ${modalType === TransactionType.IN ? 'bg-green-600' : 'bg-orange-600'}`}>
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
                 {modalType === TransactionType.IN ? <ArrowDownCircle /> : <ArrowUpCircle />}
-                {modalType === TransactionType.IN ? 'Nhập kho hàng hóa' : 'Xuất kho hàng hóa'}
+                {modalType === TransactionType.IN ? t('inbound') : t('outbound')}
               </h3>
               <button onClick={() => setIsModalOpen(false)} className="text-white/80 hover:text-white transition-colors">
                 <X className="w-6 h-6" />
@@ -159,7 +162,7 @@ const Operations: React.FC = () => {
                   
                   {/* Step 1: Code Selection */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">1. Chọn Mã hàng</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('selectCode')}</label>
                     <select
                       className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white dark:bg-gray-700 text-sm text-gray-800 dark:text-white"
                       value={selectedCode}
@@ -168,7 +171,7 @@ const Operations: React.FC = () => {
                           setSelectedItemId(''); // Reset item when code changes
                       }}
                     >
-                      <option value="">-- Chọn Mã (Code) --</option>
+                      <option value="">-- {t('itemCode')} --</option>
                       {uniqueCodes.map(code => (
                         <option key={code} value={code}>{code}</option>
                       ))}
@@ -177,7 +180,7 @@ const Operations: React.FC = () => {
 
                   {/* Step 2: Item Selection */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">2. Chọn Tên chi tiết</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('selectDetail')}</label>
                     <select
                       required
                       className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none bg-white dark:bg-gray-700 text-sm text-gray-800 dark:text-white disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:text-gray-400 dark:disabled:text-gray-500"
@@ -185,17 +188,17 @@ const Operations: React.FC = () => {
                       onChange={(e) => setSelectedItemId(e.target.value)}
                       disabled={!selectedCode}
                     >
-                      <option value="">-- Chọn chi tiết --</option>
+                      <option value="">-- {t('materialName')} --</option>
                       {filteredItems.map(item => (
                         <option key={item.id} value={item.id}>
-                          {item.materialName.substring(0, 40)}... (Tồn: {item.stockIn} {item.unit})
+                          {item.materialName.substring(0, 40)}... ({t('stock')}: {item.stockIn} {item.unit})
                         </option>
                       ))}
                     </select>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Số lượng</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('quantity')}</label>
                     <input
                       type="number"
                       required
@@ -208,11 +211,11 @@ const Operations: React.FC = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Ghi chú (tùy chọn)</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('note')}</label>
                     <textarea
                       rows={3}
                       className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-none"
-                      placeholder="Nhập lý do, mã đơn hàng, v.v."
+                      placeholder=""
                       value={note}
                       onChange={(e) => setNote(e.target.value)}
                     ></textarea>
@@ -228,7 +231,7 @@ const Operations: React.FC = () => {
                           : 'bg-orange-600 hover:bg-orange-700 shadow-orange-200 dark:shadow-none'
                       } ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
                     >
-                      {loading ? 'Đang xử lý...' : (modalType === TransactionType.IN ? 'Xác nhận Nhập kho' : 'Xác nhận Xuất kho')}
+                      {loading ? t('processing') : (modalType === TransactionType.IN ? t('confirmIn') : t('confirmOut'))}
                     </button>
                   </div>
                 </form>
