@@ -173,6 +173,12 @@ const translations = {
     aiHint: "Bấm nút bên dưới để AI phân tích xu hướng kho hàng dựa trên dữ liệu lọc hiện tại.",
     aiBtn: "Phân tích ngay",
     aiThinking: "Đang suy nghĩ...",
+    
+    // Statistics Filters
+    filterTransDirection: "Loại giao dịch",
+    transAll: "Tất cả (Nhập/Xuất)",
+    transIn: "Chỉ Nhập kho",
+    transOut: "Chỉ Xuất kho",
 
     // 404 Not Found
     notFoundTitle: "Không tìm thấy trang",
@@ -343,6 +349,12 @@ const translations = {
     aiHint: "Click below to let AI analyze inventory trends based on current filters.",
     aiBtn: "Analyze Now",
     aiThinking: "Thinking...",
+    
+    // Statistics Filters
+    filterTransDirection: "Transaction Type",
+    transAll: "All (In/Out)",
+    transIn: "Inbound Only",
+    transOut: "Outbound Only",
 
     // 404 Not Found
     notFoundTitle: "Page Not Found",

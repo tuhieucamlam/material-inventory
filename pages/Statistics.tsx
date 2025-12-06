@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { StorageService } from '../services/storage';
 import { Transaction, TransactionType, InventoryItem } from '../types';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Calendar, AlertCircle, Package, Factory, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ListFilter, Tag } from 'lucide-react';
+import { Calendar, AlertCircle, Package, Factory, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, ListFilter, Tag, ArrowRightLeft } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTheme } from '../contexts/ThemeContext';
 
@@ -16,6 +16,7 @@ const Statistics: React.FC = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [filterType, setFilterType] = useState<'ALL' | 'MATERIAL' | 'PRODUCT'>('ALL');
+  const [filterDirection, setFilterDirection] = useState<'ALL' | 'IN' | 'OUT'>('ALL'); // New: In/Out
   const [filterFactory, setFilterFactory] = useState('');
   
   // 2-Step Item Filter
@@ -40,7 +41,7 @@ const Statistics: React.FC = () => {
   // Reset pagination when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [startDate, endDate, filterType, filterFactory, filterItemCode, filterItemId, rowsPerPage]);
+  }, [startDate, endDate, filterType, filterDirection, filterFactory, filterItemCode, filterItemId, rowsPerPage]);
 
   // Map Item IDs to details for quick lookup
   const itemMap = useMemo(() => {
@@ -92,10 +93,16 @@ const Statistics: React.FC = () => {
       const item = itemMap[t.itemId];
       if (!item) return false; // Skip if item deleted or unknown
 
-      // Type Filter
+      // Type Filter (Material vs Product)
       const isProduct = item.type === 'PRODUCT';
       if (filterType === 'MATERIAL' && isProduct) return false;
       if (filterType === 'PRODUCT' && !isProduct) return false;
+
+      // Transaction Direction Filter (In vs Out)
+      if (filterDirection !== 'ALL') {
+          if (filterDirection === 'IN' && t.type !== TransactionType.IN) return false;
+          if (filterDirection === 'OUT' && t.type !== TransactionType.OUT) return false;
+      }
 
       // Factory Filter
       if (filterFactory && item.factoryCode !== filterFactory) return false;
@@ -108,7 +115,7 @@ const Statistics: React.FC = () => {
 
       return true;
     });
-  }, [transactions, startDate, endDate, filterType, filterFactory, filterItemCode, filterItemId, itemMap]);
+  }, [transactions, startDate, endDate, filterType, filterDirection, filterFactory, filterItemCode, filterItemId, itemMap]);
 
   // Aggregate data for chart
   const chartData = useMemo(() => {
@@ -150,11 +157,13 @@ const Statistics: React.FC = () => {
         </div>
       </div>
 
-      {/* FILTER BAR */}
+      {/* FILTER BAR - REDESIGNED */}
       <div className="bg-white dark:bg-gray-800 p-4 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex flex-col gap-4 transition-colors">
-         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+         
+         {/* ROW 1: General Filters (Warehouse, Trans Type, Item Type, Date) */}
+         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
              
-             {/* 1. Warehouse Filter (Moved to First) */}
+             {/* 1. Warehouse Filter */}
              <div className="relative">
                  <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
                      <Factory className="w-4 h-4" />
@@ -171,7 +180,23 @@ const Statistics: React.FC = () => {
                  </select>
              </div>
 
-             {/* 2. Type Filter */}
+             {/* 2. Transaction Direction (IN/OUT) */}
+             <div className="relative">
+                 <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                     <ArrowRightLeft className="w-4 h-4" />
+                 </div>
+                 <select 
+                    className="w-full h-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm font-medium outline-none focus:border-indigo-500 appearance-none text-gray-800 dark:text-gray-200"
+                    value={filterDirection}
+                    onChange={e => setFilterDirection(e.target.value as any)}
+                 >
+                     <option value="ALL">{t('transAll')}</option>
+                     <option value="IN">{t('transIn')}</option>
+                     <option value="OUT">{t('transOut')}</option>
+                 </select>
+             </div>
+
+             {/* 3. Item Type (Material/Product) */}
              <div className="relative">
                  <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
                      <ListFilter className="w-4 h-4" />
@@ -191,7 +216,24 @@ const Statistics: React.FC = () => {
                  </select>
              </div>
 
-             {/* 3. Item Code Filter (Step 1) */}
+             {/* 4. Date Range */}
+             <div className="bg-gray-50 dark:bg-gray-700 p-2 rounded-lg border border-gray-200 dark:border-gray-600 flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-gray-400 shrink-0" />
+                <div className="flex flex-col w-full">
+                    <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-semibold">{t('filterDateFrom')}</span>
+                    <input type="date" className="bg-transparent text-sm outline-none w-full font-medium text-gray-800 dark:text-gray-200 dark:[color-scheme:dark]" value={startDate} onChange={e => setStartDate(e.target.value)} />
+                </div>
+                <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
+                <div className="flex flex-col w-full">
+                    <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-semibold">{t('filterDateTo')}</span>
+                    <input type="date" className="bg-transparent text-sm outline-none w-full font-medium text-gray-800 dark:text-gray-200 dark:[color-scheme:dark]" value={endDate} onChange={e => setEndDate(e.target.value)} />
+                </div>
+             </div>
+         </div>
+
+         {/* ROW 2: Item Specific Filters (Code, Name) */}
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+             {/* 5. Item Code Filter (Step 1) */}
              <div className="relative">
                  <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
                      <Tag className="w-4 h-4" />
@@ -211,7 +253,7 @@ const Statistics: React.FC = () => {
                  </select>
              </div>
 
-             {/* 4. Specific Item Filter (Step 2) */}
+             {/* 6. Specific Item Filter (Step 2) */}
              <div className="relative">
                  <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
                      <Package className="w-4 h-4" />
@@ -225,26 +267,11 @@ const Statistics: React.FC = () => {
                      <option value="">-- {t('materialName')} --</option>
                      {filteredItemsByCode.map(i => (
                          <option key={i.id} value={i.id}>
-                            {i.materialName.substring(0, 30)}...
+                            {i.materialName.substring(0, 60)}...
                          </option>
                      ))}
                  </select>
              </div>
-
-             {/* 5. Date Range */}
-             <div className="bg-gray-50 dark:bg-gray-700 p-2 rounded-lg border border-gray-200 dark:border-gray-600 flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-gray-400 shrink-0" />
-                <div className="flex flex-col w-full">
-                    <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-semibold">{t('filterDateFrom')}</span>
-                    <input type="date" className="bg-transparent text-sm outline-none w-full font-medium text-gray-800 dark:text-gray-200 dark:[color-scheme:dark]" value={startDate} onChange={e => setStartDate(e.target.value)} />
-                </div>
-                <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1"></div>
-                <div className="flex flex-col w-full">
-                    <span className="text-[10px] text-gray-500 dark:text-gray-400 uppercase font-semibold">{t('filterDateTo')}</span>
-                    <input type="date" className="bg-transparent text-sm outline-none w-full font-medium text-gray-800 dark:text-gray-200 dark:[color-scheme:dark]" value={endDate} onChange={e => setEndDate(e.target.value)} />
-                </div>
-             </div>
-
          </div>
       </div>
 
